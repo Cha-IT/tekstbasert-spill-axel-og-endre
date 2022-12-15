@@ -25,38 +25,45 @@ class Brett:
         self.valg2 = valg2
         self.destinasjon1 = destinasjon1
         self.destinasjon2 = destinasjon2
+        self.fiende = fiende
 
 brett1 = Brett("Du befinner deg i midten av en skog med to stier forran deg", "høyre", "venstre", "kamp", "neste brett", fiende1)
-brett2 = Brett("d", "høyre", "venstre", "kamp", "neste brett", fiende2)
+brett2 = Brett("d", "høyre", "venstre", "neste brett", "kamp", fiende2)
 brett3 = Brett("a", "høyre", "venstre", "kamp", "nesteBrett", fiende3)
 våreBrett = [brett1, brett2, brett3]
 brettnr = 0
 
-def nesteBrett(våreBrett, brettnr):
+def nesteBrett():
+    if brettnr == len(våreBrett):
+        print("Siste brett")
+        return
     nøytral(våreBrett[brettnr])
 
 def nøytral(brett):
     kampStatus = 0
     print(brett.forklaring)
-    print("du kan se inventaret ditt ved å skrive, seInv eller se inventar")
+    print("du kan se inventaret ditt ved å skrive se inventar")
     print("du kan velge å enten gå mot", brett.valg1 , "eller mot", brett.valg2)
     while kampStatus == 0:
         brukerInput = input()
-        if brukerInput == "seInv" or "se inventar":
+        if brukerInput == "seInv" or brukerInput == "se inventar":
             seInv(inventar)
         elif brukerInput == "høyre":
             if brett.destinasjon1 == "kamp":
                 kamp(brett.fiende)
-                kampStatus = 1
+                break
             if brett.destinasjon1 == "neste brett":
                 brettnr += 1
-        elif brukerInput == "vestre":
-            if brett.destinasjon1 == "kamp":
+                nesteBrett()
+        elif brukerInput == "venstre":
+            if brett.destinasjon2 == "kamp":
                 kamp(brett.fiende)
-                kampStatus = 1
-            if brett.destinasjon1 == "neste brett":
+                break
+            if brett.destinasjon2 == "neste brett":
                 brettnr += 1
-    nesteBrett()
+                nesteBrett()
+        else:
+            print("s")
 
 class Item:
     def __init__(self, navn, type, forsvar, angrep):
@@ -72,17 +79,24 @@ truse = Item("truse", "rustning", 1, 0)
 bukse = Item("bukse", "rustning", 2, 0)
 items = [smørkniv, kniv, pistol, truse, bukse]
 inventar = []
-tilfeldigItem = 0
+equippedItems = []
+
+def seInv(inventar):
+    for i in inventar:
+        print(f"{i.navn}, ")
+
+def seEquipped(equippedItems):
+    for i in equippedItems:
+        print(f"{i.navn}, ")
 
 def PlukkOppItem(item, inventar):
     inventar.append(item)
-     
+
+tilfeldigItem = 0 
 def drop(tilfeldigItem, items):
      tilfeldigItem = random.choice(items)
      print("du fikk en", tilfeldigItem.navn)
      PlukkOppItem(tilfeldigItem, inventar)
-
-equippedItems = []
 
 def equip(item):
     if item in inventar:
@@ -110,14 +124,6 @@ def equip(item):
             print(f"{item.navn} equipped")
     else:
         print("item not found in inventory")
-
-def seInv(inventar):
-    for i in inventar:
-        print(f"{i.navn}, ")
-
-def seEquipped(equippedItems):
-    for i in equippedItems:
-        print(f"{i.navn}, ")
 
 def kamp(fiende):
     spillerHelse = spiller.helse
@@ -154,5 +160,10 @@ def kamp(fiende):
     if fiendeHelse <= 0:
         print("Du vant kampen!")
         drop(tilfeldigItem, items)
+        global brettnr
+        brettnr += 1
+        nesteBrett()
     else:
         print("Game Over")
+
+nesteBrett()
